@@ -1,0 +1,281 @@
+# Implementation Plan
+
+- [ ] 1. 设置项目结构和依赖
+  - 配置 Cargo.toml 添加 glam 0.33、nom 8.0.0、memmap2、thiserror 依赖
+  - 创建模块结构：parser、store、math、visitor
+  - 设置开发依赖：proptest、criterion
+  - _Requirements: 1.1, 1.2_
+
+- [ ] 2. 实现核心数据结构
+- [ ] 2.1 实现 ID 类型和基础类型
+  - 实现 NodeId、GeometryId、ColorId、StringId 新类型
+  - 实现 BBox3 包围盒结构
+  - 使用 glam::Vec3 表示三维向量
+  - _Requirements: 7.1, 7.2, 4.2_
+
+- [ ]* 2.2 编写属性测试：包围盒变换正确性
+  - **Property 11: Bounding box transformation**
+  - **Validates: Requirements 4.3**
+
+- [ ] 2.3 实现 Arena 分配器
+  - 实现 Arena 结构体和分配方法
+  - 支持泛型类型分配和切片分配
+  - _Requirements: 6.3_
+
+- [ ] 2.4 实现字符串驻留
+  - 实现 StringInterner 结构体
+  - 实现 intern 和 get 方法
+  - 使用 HashMap 存储字符串到 ID 的映射
+  - _Requirements: 6.2_
+
+- [ ]* 2.5 编写属性测试：字符串驻留去重
+  - **Property 14: String interning deduplication**
+  - **Validates: Requirements 6.2**
+
+- [ ] 2.6 实现节点和几何体结构
+  - 实现 Node、NodeKind、FileNode、ModelNode、GroupNode
+  - 实现 Geometry、GeometryKind 和所有几何体类型
+  - 实现 Attribute、Color 结构
+  - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5_
+
+- [ ]* 2.7 编写属性测试：颜色表示支持
+  - **Property 16: Color representation support**
+  - **Validates: Requirements 7.5**
+
+- [ ] 2.8 实现 Store 主结构
+  - 实现 Store 结构体，包含 Arena 和 StringInterner
+  - 实现 new_node、new_geometry 方法
+  - 实现 get_node、get_geometry 访问方法
+  - 实现 find_root_group 查找方法
+  - _Requirements: 7.3_
+
+- [ ]* 2.9 编写属性测试：场景图关系一致性
+  - **Property 15: Scene graph relationship consistency**
+  - **Validates: Requirements 7.3**
+
+- [ ] 3. 实现 RVM 二进制解析器
+- [ ] 3.1 实现基础解析组合子
+  - 实现 be_u32、be_f32、be_u8 解析器（使用 nom）
+  - 实现 parse_string 解析 RVM 字符串格式
+  - 实现 parse_mat3x4 解析变换矩阵
+  - 实现 parse_bbox 解析包围盒
+  - _Requirements: 5.1, 5.2, 5.3, 5.4_
+
+- [ ]* 3.2 编写属性测试：字符串解析正确性
+  - **Property 12: String parsing correctness**
+  - **Validates: Requirements 5.4**
+
+- [ ] 3.3 实现块头解析
+  - 实现 parse_chunk_header 解析块 ID 和偏移量
+  - 实现块 ID 验证逻辑
+  - _Requirements: 2.2_
+
+- [ ] 3.4 实现 HEAD 块解析
+  - 实现 parse_head 解析文件头信息
+  - 创建 File 节点并填充数据
+  - _Requirements: 2.2_
+
+- [ ] 3.5 实现 MODL 块解析
+  - 实现 parse_modl 解析模型信息
+  - 创建 Model 节点并填充数据
+  - _Requirements: 2.2_
+
+- [ ] 3.6 实现 COLR 块解析
+  - 实现 parse_colr 解析颜色信息
+  - 创建 Color 结构并关联到模型
+  - _Requirements: 2.2_
+
+- [ ] 3.7 实现 PRIM/OBST/INSU 块解析
+  - 实现 parse_prim 解析几何体数据
+  - 支持所有 11 种几何类型的解析
+  - 处理 Primitive、Obstruction、Insulation 类型
+  - _Requirements: 2.2, 2.3_
+
+- [ ]* 3.8 编写属性测试：几何类型支持
+  - **Property 3: Geometry type support**
+  - **Validates: Requirements 2.3**
+
+- [ ] 3.9 实现 CNTB/CNTE 块解析
+  - 实现 parse_cntb 解析组信息
+  - 实现递归解析子节点
+  - 处理组的嵌套结构
+  - _Requirements: 2.2, 2.4_
+
+- [ ]* 3.10 编写属性测试：场景图层次保持
+  - **Property 4: Scene graph hierarchy preservation**
+  - **Validates: Requirements 2.4**
+
+- [ ] 3.11 实现顶层 RVM 解析器
+  - 实现 parse_rvm 函数协调所有块解析
+  - 实现解析状态管理（栈结构）
+  - 处理块序列和嵌套
+  - _Requirements: 2.2_
+
+- [ ]* 3.12 编写属性测试：块类型识别
+  - **Property 2: Block type recognition**
+  - **Validates: Requirements 2.2**
+
+- [ ] 3.13 实现错误处理
+  - 定义 ParseError 枚举
+  - 实现 nom 错误到 ParseError 的转换
+  - 添加错误上下文信息
+  - _Requirements: 2.5, 5.5_
+
+- [ ]* 3.14 编写属性测试：解析错误报告
+  - **Property 5: Parse error reporting**
+  - **Property 13: Parse error context**
+  - **Validates: Requirements 2.5, 5.5**
+
+- [ ] 4. 实现属性文件解析器
+- [ ] 4.1 实现基础文本解析组合子
+  - 实现 parse_indentation 解析缩进
+  - 实现 skip_space、skip_eol 等辅助函数
+  - 实现 parse_identifier 解析标识符
+  - _Requirements: 3.2_
+
+- [ ] 4.2 实现 NEW 行解析
+  - 实现 parse_new_line 识别 NEW 关键字
+  - 提取组名称
+  - _Requirements: 3.2_
+
+- [ ] 4.3 实现 END 行解析
+  - 实现 parse_end_line 识别 END 关键字
+  - _Requirements: 3.2_
+
+- [ ]* 4.4 编写属性测试：属性语法处理
+  - **Property 7: Attribute syntax handling**
+  - **Validates: Requirements 3.2**
+
+- [ ] 4.5 实现属性赋值行解析
+  - 实现 parse_attribute_line 解析 key := value 语法
+  - 处理多个键值对和 &end& 分隔符
+  - 处理引号包围的值
+  - _Requirements: 3.2, 3.4, 3.5_
+
+- [ ]* 4.6 编写属性测试：引号去除
+  - **Property 9: Quote removal in attribute values**
+  - **Validates: Requirements 3.4**
+
+- [ ]* 4.7 编写属性测试：多属性行解析
+  - **Property 10: Multi-attribute line parsing**
+  - **Validates: Requirements 3.5**
+
+- [ ] 4.8 实现顶层属性文件解析器
+  - 实现 parse_att 函数协调行解析
+  - 维护缩进栈匹配场景图层次
+  - 将属性关联到正确的节点
+  - _Requirements: 3.1, 3.3_
+
+- [ ]* 4.9 编写属性测试：属性文件解析
+  - **Property 6: Attribute file parsing**
+  - **Validates: Requirements 3.1**
+
+- [ ]* 4.10 编写属性测试：缩进层次映射
+  - **Property 8: Indentation hierarchy mapping**
+  - **Validates: Requirements 3.3**
+
+- [ ] 5. 实现文件 I/O 和内存映射
+- [ ] 5.1 实现文件读取功能
+  - 使用 memmap2 实现内存映射文件读取
+  - 实现文件类型识别（.rvm, .txt, .att）
+  - 处理文件打开错误
+  - _Requirements: 2.1, 6.4_
+
+- [ ] 5.2 集成解析器与文件读取
+  - 实现 parse_rvm_file 函数
+  - 实现 parse_att_file 函数
+  - 处理解析错误和 I/O 错误
+  - _Requirements: 2.1_
+
+- [ ] 6. 实现命令行接口
+- [ ] 6.1 实现命令行参数解析
+  - 使用 clap 或手动解析命令行参数
+  - 支持文件路径参数
+  - 支持 --help 选项
+  - _Requirements: 1.4, 9.1, 9.2_
+
+- [ ]* 6.2 编写属性测试：文件路径参数解析
+  - **Property 17: File path argument parsing**
+  - **Validates: Requirements 9.1**
+
+- [ ] 6.3 实现参数验证
+  - 验证文件路径有效性
+  - 检测无效参数
+  - 显示错误信息
+  - _Requirements: 9.3_
+
+- [ ]* 6.4 编写属性测试：无效参数错误处理
+  - **Property 18: Invalid argument error handling**
+  - **Validates: Requirements 9.3**
+
+- [ ] 6.5 实现主程序流程
+  - 读取和解析文件
+  - 收集统计信息
+  - 输出结果
+  - 处理错误和退出码
+  - _Requirements: 9.4, 9.5_
+
+- [ ]* 6.6 编写属性测试：统计输出完整性
+  - **Property 19: Statistics output completeness**
+  - **Validates: Requirements 9.4**
+
+- [ ]* 6.7 编写属性测试：解析失败退出码
+  - **Property 20: Parse failure exit code**
+  - **Validates: Requirements 9.5**
+
+- [ ] 7. 实现访问者模式和统计收集
+- [ ] 7.1 实现 Visitor trait
+  - 定义 Visitor trait 接口
+  - 实现 traverse 函数遍历场景图
+  - _Requirements: 10.2_
+
+- [ ] 7.2 实现统计信息收集器
+  - 实现 StatsVisitor 统计节点和几何体数量
+  - 统计各种几何类型的数量
+  - 计算平均值等统计指标
+  - _Requirements: 9.4_
+
+- [ ]* 7.3 编写单元测试：访问者遍历
+  - 测试访问者能访问所有节点
+  - 测试统计信息的正确性
+
+- [ ] 8. 检查点 - 确保所有测试通过
+  - 确保所有测试通过，如有问题请询问用户
+
+- [ ] 9. 集成测试和验证
+- [ ]* 9.1 创建测试 RVM 文件
+  - 创建包含所有几何类型的最小测试文件
+  - 创建包含嵌套结构的测试文件
+  - 创建边界情况测试文件
+
+- [ ]* 9.2 编写集成测试
+  - 测试完整的解析流程
+  - 测试与 C++ 版本的输出对比
+  - 测试错误处理场景
+
+- [ ]* 9.3 性能基准测试
+  - 使用 criterion 创建基准测试
+  - 测试解析速度
+  - 与 C++ 版本比较性能
+
+- [ ] 10. 文档和代码质量
+- [ ] 10.1 编写 API 文档
+  - 为公共 API 添加文档注释
+  - 编写使用示例
+  - 生成 rustdoc 文档
+  - _Requirements: 8.2_
+
+- [ ] 10.2 代码审查和优化
+  - 运行 cargo clippy 检查代码
+  - 运行 cargo fmt 格式化代码
+  - 优化性能热点
+  - _Requirements: 1.3_
+
+- [ ] 10.3 编写 README
+  - 说明项目目的和功能
+  - 提供构建和使用说明
+  - 列出依赖和要求
+  - 提供示例用法
+
+- [ ] 11. 最终检查点 - 确保所有测试通过
+  - 确保所有测试通过，如有问题请询问用户

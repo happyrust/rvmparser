@@ -1,0 +1,54 @@
+# Implementation Plan
+
+- [x] 1. 完整实现层次结构处理工具（正则扁平化、保留、丢弃）
+
+
+
+  - 添加 regex 依赖到 Cargo.toml
+  - 创建 hierarchy 模块结构（mod.rs, flatten_regex.rs, flatten_keep.rs, discard.rs）
+  - 扩展 Store 添加克隆和移动方法：
+    - 实现 clone_node 方法
+    - 实现 clone_geometry 方法
+    - 实现 remove_node 方法
+    - 实现 move_geometries 方法
+    - 实现 move_attributes 方法
+    - 实现 take_children 方法
+  - 实现正则表达式扁平化（flatten_regex.rs）：
+    - 创建 RegexFlattener 结构体
+    - 实现正则表达式编译和验证
+    - 实现名称匹配检查
+    - 实现递归子节点处理
+    - 实现几何体移动逻辑
+    - 实现属性移动逻辑
+    - 实现最低层级保留逻辑
+    - 实现统计信息收集
+  - 实现保留组扁平化（flatten_keep.rs）：
+    - 创建 KeepFlattener 结构体
+    - 实现标签文件解析
+    - 实现标签集合管理
+    - 实现源 Store 标签收集
+    - 实现节点标记（选中和祖先）
+    - 实现新 Store 创建
+    - 实现剪枝复制逻辑
+    - 实现递归复制
+  - 实现组丢弃（discard.rs）：
+    - 创建 GroupDiscarder 结构体
+    - 实现标签文件解析
+    - 实现丢弃标签集合管理
+    - 实现递归子节点剪枝
+    - 实现节点移除
+    - 实现丢弃计数
+  - 实现层次工具模块入口（hierarchy/mod.rs）：
+    - 定义 HierarchyError 类型
+    - 导出公共接口
+    - 实现便捷函数
+  - 集成到主程序：
+    - 添加 --keep-regex 命令行选项
+    - 添加 --keep-groups 命令行选项
+    - 添加 --discard-groups 命令行选项
+    - 实现操作顺序执行
+    - 输出处理统计信息
+    - 更新帮助信息
+  - 更新 lib.rs 导出 hierarchy 模块
+  - 运行 cargo clippy 和 cargo fmt 确保代码质量
+  - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5, 2.1, 2.2, 2.3, 2.4, 2.5, 3.1, 3.2, 3.3, 3.4, 3.5, 4.1, 4.2, 4.3, 4.4, 4.5, 5.1, 5.2, 5.3, 5.4, 5.5, 6.1, 6.2, 6.3, 6.4, 6.5, 7.1, 7.2, 7.3, 7.4, 7.5, 8.1, 8.2, 8.3, 8.4, 8.5, 9.1, 9.2, 9.3, 9.4, 9.5, 10.1, 10.2, 10.3, 10.4, 10.5_
