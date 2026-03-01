@@ -4,6 +4,3 @@
 [submodule "libs/rapidjson"]
 	path = libs/rapidjson
 	url = https://github.com/Tencent/rapidjson.git
-[submodule "rvm-rs"]
-	path = rvm-rs
-	url = ./rvm-rs

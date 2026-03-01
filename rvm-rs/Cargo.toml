@@ -1,0 +1,22 @@
+[package]
+name = "rvmparser"
+version = "0.1.0"
+edition = "2021"
+description = "Fast parser and exporter for AVEVA PDMS RVM files"
+license = "MIT"
+
+[[bin]]
+name = "rvmparser"
+path = "src/main.rs"
+
+[dependencies]
+glam = "0.29"
+memmap2 = "0.9"
+thiserror = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+base64 = "0.22"
+regex = "1"
+
+[dev-dependencies]
+tempfile = "3"
