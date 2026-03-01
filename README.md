@@ -100,6 +100,11 @@ Open `msvc15\rvmparser.sln` in visual studio and build the solution.
 Enter the `make` directory and type `make`.
 
 
+## Documentation
+
+- **[docs/](docs/)** - 项目文档中心（开发进度、实现细节、任务记录等）
+- **[docs/guides/README_RUST.md](docs/guides/README_RUST.md)** - Rust 实现说明
+
 ## See also
 - [Plant Mock-Up Converter](https://github.com/benvautrin/pmuc).
 
