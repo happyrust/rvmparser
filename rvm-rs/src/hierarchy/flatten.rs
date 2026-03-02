@@ -154,16 +154,3 @@ impl Flatten {
     }
 }
 
-// Extend StringInterner with lookup by string
-impl crate::store::StringInterner {
-    pub fn get_id(&self, s: &str) -> Option<usize> {
-        self.map.get(s).copied()
-    }
-
-    pub fn clone(&self) -> Self {
-        Self {
-            map: self.map.clone(),
-            strings: self.strings.clone(),
-        }
-    }
-}

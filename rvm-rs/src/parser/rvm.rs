@@ -70,8 +70,8 @@ impl<'a> Reader<'a> {
         if self.pos + byte_len > self.data.len() { return Err(RvmError::UnexpectedEof); }
         let raw = &self.data[self.pos..self.pos + byte_len];
         let actual_len = raw.iter().position(|&b| b == 0).unwrap_or(byte_len);
-        let s = std::str::from_utf8(&raw[..actual_len]).unwrap_or("");
-        let id = store.strings.intern(s);
+        let s = String::from_utf8_lossy(&raw[..actual_len]);
+        let id = store.strings.intern(&s);
         self.pos += byte_len;
         Ok(id)
     }

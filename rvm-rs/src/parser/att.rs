@@ -82,31 +82,23 @@ fn parse_attributes(
         None => return Ok(()),
     };
 
-    let mut remaining = line;
-    loop {
-        let assign_pos = remaining.find(":=");
-        if assign_pos.is_none() {
-            return Err(AttError::ParseError {
-                line: line_num,
-                msg: "Failed to find ':=' token".into(),
-            });
+    for part in line.split("&end&") {
+        let part = part.trim();
+        if part.is_empty() {
+            continue;
         }
-        let assign_pos = assign_pos.unwrap();
 
-        let key = remaining[..assign_pos].trim();
-        let after_assign = &remaining[assign_pos + 2..];
-        let after_assign = after_assign.trim_start();
+        let (key_str, value_str) = part.split_once(":=").ok_or_else(|| AttError::ParseError {
+            line: line_num,
+            msg: "Failed to find ':=' token".into(),
+        })?;
 
-        let (value_str, rest) = if let Some(sep_pos) = after_assign.find("&end&") {
-            (&after_assign[..sep_pos], Some(&after_assign[sep_pos + 5..]))
-        } else {
-            (after_assign, None)
-        };
-
-        let mut value = value_str.trim();
-        if value.len() >= 2 && value.starts_with('\'') && value.ends_with('\'') {
-            value = &value[1..value.len() - 1];
-        }
+        let key = key_str.trim();
+        let value_trimmed = value_str.trim();
+        let value = value_trimmed
+            .strip_prefix('\'')
+            .and_then(|v| v.strip_suffix('\''))
+            .unwrap_or(value_trimmed);
 
         let key_id = store.strings.intern(key);
         let val_id = store.strings.intern(value);
@@ -116,12 +108,6 @@ fn parse_attributes(
             attr.val = val_id;
         } else {
             node.attributes.push(Attribute { key: key_id, val: val_id });
-        }
-
-        if let Some(r) = rest {
-            remaining = r.trim_start();
-        } else {
-            break;
         }
     }
 

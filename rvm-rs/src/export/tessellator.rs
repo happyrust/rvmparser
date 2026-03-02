@@ -177,9 +177,10 @@ fn tessellate_cylinder(radius: f32, height: f32, scale: f32, tolerance: f32, sta
         normals_vec.extend_from_slice(&[c, s, 0.0]);
     }
 
+    // C++ winding: quadIndices(2*i, 2*ii, 2*ii+1, 2*i+1) => (a,b,c, a,c,d)
     for i in 0..n_seg {
         let b = i * 2;
-        indices.extend_from_slice(&[b, b+1, b+3, b, b+3, b+2]);
+        indices.extend_from_slice(&[b, b+2, b+3, b, b+3, b+1]);
     }
 
     // bottom cap
@@ -251,7 +252,7 @@ fn tessellate_snout(
 
     for i in 0..n_seg {
         let b = i * 2;
-        indices.extend_from_slice(&[b, b+1, b+3, b, b+3, b+2]);
+        indices.extend_from_slice(&[b, b+2, b+3, b, b+3, b+1]);
     }
 
     // bottom cap

@@ -218,7 +218,7 @@ impl Default for Store {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct StringInterner {
     pub map: HashMap<String, usize>,
     pub strings: Vec<String>,
@@ -245,6 +245,10 @@ impl StringInterner {
 
     pub fn get(&self, id: usize) -> &str {
         &self.strings[id]
+    }
+
+    pub fn get_id(&self, s: &str) -> Option<usize> {
+        self.map.get(s).copied()
     }
 }
 
