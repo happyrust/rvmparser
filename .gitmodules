@@ -6,4 +6,4 @@
 	url = https://github.com/Tencent/rapidjson.git
 [submodule "rvm-rs"]
 	path = rvm-rs
-	url = ./rvm-rs
+	url = https://github.com/happyrust/rvm-rs.git
