@@ -40,3 +40,5 @@ msvc15/rvmparser
 make/obj
 make/rvmparser
 .ace-tool/
+
+npm-cache
